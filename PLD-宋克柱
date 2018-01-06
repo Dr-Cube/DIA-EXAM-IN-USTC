@@ -1,0 +1,202 @@
+# 可编程逻辑器件原理与应用 2017回忆版考题及复习重点
+
+##USTC 任课教师：宋克柱
+
+---
+
+## 回忆版试题
+### 一、简答（54）
+1. APEX20K的clockboost应用
+2. 如何选择PLD
+3. 有哪些PLD编程元件，区别。答熔丝开关、浮栅、SRAM
+4. $T_{su}$ $T_{hold}$ $T_{co}$画图解释
+5. SignalTapII的特点和使用步骤
+6. 组合逻辑电路是什么？毛刺有什么危害，是如何产生和消除的？
+5. CPLD的宏单元，FPGA的LE
+### 二、设计（10）
+设计一个9bit的减法计数器，要求有异步清零和异步置1。
+
+### 三、分析
+1. SRAM（24）
+Asyn SRAM
+![](http://ww1.sinaimg.cn/large/c9239590ly1fn6abdtmnsj20ng08awev.jpg)
+$t_{RC}$: min 7ns
+$t_{AA}$: max 7ns
+$t_{OHA}$: min 3ns
+
+    （1）解释三个参数$t_{RC}$，$t_{AA}$，$t_{OHA}$。read cycle time, address access time，output hold time
+    （2）如果$t_{RC}=6, 7, 8 ns$，问$t_{AA}$，$t_{OHA}$值域
+    （3）给$t_{AA_{max}}=8 ns$，$t_{OHA_{min}}=2 ns$，问能否算出$t_{RC}$
+    
+2. 求q1稳定输出的时钟的最大频率（10）
+![](http://ww1.sinaimg.cn/large/c9239590ly1fn6shwlo4rj20fj03ijr8.jpg)
+
+
+
+
+
+--------------
+
+## 复习
+1. PLD 概念：可由用户进行编程（配置）实现所需逻辑功能的数字集成电路。具有集成度高、设计灵活、可靠性高、设计周期短等优点。
+发展趋势：核心工作电压、功耗、IPCore
+
+    1) 降低互连延时，提高速度
+    2) 设计技术向高层设计转移
+    3) 向模数混合编程技术发展
+    4) IP Core
+    5) 产品丰富，性能完善
+FPGA、CPLD概念、区别：工艺不同。CPLD基于乘积项技术、EEPROM，断电保持。FPGA基于查找表技术、SRAM工艺，断电失效。
+2. PLD如何编程：开关通断、浮栅、SRAM
+3. CPLD：MAX7000
+PLD的几个重要参数
+$T_{pd}$ $T_{su}$ $T_{hold}$ $T_{co}$ $T_{fsu}$ $F_cnt$
+组成结构（记住）：一个LAB由16个宏单元Macrocells阵列组成。多个LAB通过PIA互连
+
+    1) 逻辑阵列块LAB（logic array block） 
+    2) 宏单元 Macrocells（只实现组合逻辑）  **CPLD最核心**
+        逻辑阵列（logic array） 可以实现组合逻辑，每个宏单元可以提供5个乘积项。
+        乘积项选择矩阵（product-term select matrix）用来分配这些乘积项，它们或者作为基本逻辑输入实现组合逻辑功能，或者作为宏单元的寄存器的clear、preset、clock、clock enable控制功能。 有两种扩展乘积项：a. 共享扩展项，反馈进逻辑阵列；b. 并行扩展项，从近邻宏单元借来的扩展乘积项 
+        可编程寄存器（programmable register） 寄存器功能，每个宏单元触发器可以被单个编程实现D、T、JK、SR，带有可编程时钟控制。 
+    3) 扩展乘积项 EPT：占用最少逻辑资源而获得最快速度。
+        共享扩展（内，同一LAB内宏单元）
+        并行扩展（外，邻近宏单元）
+    4) 可编程连线阵列PIA （Programmable interconnect array）LAB之间的逻辑是通过PIA连接的。 
+    5) I/O控制块：输入、输出、双向
+两种电源：内部（5V）供内部电路和输入缓冲器buffers；I/O（5or3.3V）供给I/O输出缓冲器
+OD门：线与功能
+
+    如何使用：在漏极外部的电路添加上拉电阻。
+    完整的开漏电路应该由开漏器件和开漏上拉电阻组成。任何一个OD门输出为低，则总的输出为低
+MAX7000S ISP In-System Programmablility：四脚JTAG。查空，编程，比较
+quartusII：时序仿真、功能仿真
+
+    逻辑设计输入，编译，综合，仿真（时序、功能），配置，调试，验证
+4. DFF D触发器 时序特性关系（会画会算）
+5. FPGA：FLAX10K
+![结构图](http://ww1.sinaimg.cn/large/c9239590ly1fn69ug4kuvj20l40g23zc.jpg)
+每个LAB由8个逻辑单元LE（Logic Element）以及它们之间的进位和级连链、LAB控制信号、和一个局部互连线（local interconnect）组成
+
+    1) 逻辑阵列块LAB
+    2) 逻辑单元LE：最小逻辑单位，输入LUT、一个带有同步使能的可编程触发器、一个进位链、一个级连链。
+    3) 嵌入式阵列块EAB：
+        存储器功能：每一个EAB可以提供2048个bit，这些位可以用作RAM、ROM、双端口RAM、或FIFO；
+        复杂逻辑功能：每个EAB可以提供100-600个逻辑门
+    4) FastTrack（快速互连通道）：LE和I/O脚之间的信号连接
+    5) I/O单元：一个双向的I/O缓冲器（Buffer）和一个触发器
+时钟锁定（clock lock）、时钟自举（clock boost）在芯片内使用，不能输出
+
+    1. clocklock：使用减小时钟延迟和偏差的同步PLL
+    2. clockboost：倍频
+6. FIFO、RAM、counter计数器（*同步不考*）
+Asyn SRAM
+![](http://ww1.sinaimg.cn/large/c9239590ly1fn6abdtmnsj20ng08awev.jpg)
+
+    $t_{RC}$: read cycle time, min 7ns
+    $t_{AA}$: address access time, max 7ns
+    $t_{OHA}$: output hold time, min 3ns
+Asyn FIFO
+![](http://ww1.sinaimg.cn/large/c9239590ly1fn6ah6ifroj20ks096dgd.jpg)
+二分频逻辑电路
+![](http://ww1.sinaimg.cn/large/c9239590ly1fn6ak3id9bj20ij06gdfx.jpg)
+7. HDL（代码见后）
+计数器、D触发器、译码器
+并行语句
+8. multicore：集成了查找表LUT、乘积项Product-term、ESBembedded memory
+
+    LUT逻辑用于register-intensive功能。
+    ESB（Embedded systemblock）实现Product-term逻辑，用于组合逻辑。ESB还可用于实现Memory功能。
+magelab：16个LAB、1个ESB、1个MegaLAB互连线。 
+9. *APEX20K* 的clockboost
+![](http://ww1.sinaimg.cn/large/c9239590ly1fn6syblfw1j20ic09j3yz.jpg)
+*APEX20K* **E** 高级clockboost倍频和分频公式
+$$F_{clk0}=\frac{m}{n\times k}\times F_{in}$$
+$$F_{clk1}=\frac{m}{n\times v}\times F_{in}$$
+![](http://ww1.sinaimg.cn/large/c9239590ly1fn6bjyb5qqj20lx092t9m.jpg)
+clockshift：clockboost的功能，提供可编程的时钟延时和相位移动
+10. SignalTap2 会用
+SignalProbe
+11. 逻辑设计技巧
+毛刺的产生及如何避免
+
+    组合逻辑中同一信号经不同路径未同时到达；
+    避免：加延时，加触发器，改进电路
+多时钟系统
+多个D触发器串联分析
+12. SOPC NiosII 开发流程
+13. CAM：RAM的逆过程，给数据得地址，用于高速搜索操作
+RAM，串行
+CAM，并行
+写
+
+    每写一个数（最大32bit），需要在一个地址上写2个clock  
+读
+
+    三种模式：单匹配、多匹配、快速匹配。每个模式又分为：
+        encoded（适合于单匹配，即没有重复数据）
+        unencoded（适合于在ESB的内存里具有重复数据，即相同的数据写入内存的多个地址）
+扩展
+
+    深度：串接ESB
+    宽度：串接ESB，只对unencoded
+
+```
+//couter
+module counter(q,clk, clear)
+	input clk, clear;
+	output[8:0] q;
+
+	reg[8:0] q;
+
+	always(posedge clear or negedge clk)
+	begin
+		if (clear)
+			q <= 9'd0;
+		else
+			q <= q + 1'b1;
+	end
+
+endmodule
+
+//DFF
+module dff(d, q, clk, rst)
+	input d, clk, rst;
+	output q;
+	reg q;
+
+	always @(negedge clk or posedge rst) begin
+		if (rst)
+			q <= 1'b0;
+		else 
+			q <= d;
+		
+	end
+
+endmodule
+
+//38decoder Low
+module decoder24(A, G1, G2A_L, G2B_L, Y_L) ;
+  input G1, G2A_L, G2B_L;
+  input [2:0] A;
+  output [0:7] Y_L;
+  reg [0:7] Y_L;
+  
+  always @ (G1, G2A_L, G2B_L, A) begin
+    if (G1 & ~G2A_L & ~G2B_L)
+      case (A)
+      0: Y_L = 8'b01111111;
+      1: Y_L = 8'b10111111;
+      2: Y_L = 8'b11011111;
+      3: Y_L = 8'b11101111;
+      4: Y_L = 8'b11110111;
+      5: Y_L = 8'b11111011;
+      6: Y_L = 8'b11111101;
+      7: Y_L = 8'b11111110;
+      default Y_L = 8'b11111111;
+      endcase
+    else Y_L = 8'b11111111;
+  end
+    
+endmodule
+
+```
